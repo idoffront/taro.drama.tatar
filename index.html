@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dTARO</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><text y='50' font-size='46'>✦</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#171512; --mut:#8f8a80; --line:#e8e4dc; --line2:#d9d4c9;
+    --paper:#ffffff; --soft:#faf9f6; --gold:#a8863d;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:'Manrope',system-ui,sans-serif; font-weight:400;
+    -webkit-font-smoothing:antialiased; min-height:100vh;
+  }
+  .wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+
+  /* ---------- header ---------- */
+  header{border-bottom:1px solid var(--line)}
+  .head{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+  .logo{display:flex;align-items:center;gap:12px;text-decoration:none;color:var(--ink)}
+  .logo svg{display:block}
+  .logo b{font-weight:600;letter-spacing:.34em;font-size:14px}
+  .logo span{color:var(--mut);font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+  .head-note{font-size:12px;color:var(--mut);letter-spacing:.14em;text-transform:uppercase}
+
+  /* ---------- hero ---------- */
+  .hero{text-align:center;padding:76px 0 44px}
+  .hero .eyebrow{font-size:12px;letter-spacing:.3em;text-transform:uppercase;color:var(--gold);margin-bottom:22px}
+  h1{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:clamp(38px,6vw,64px);line-height:1.08}
+  h1 em{font-style:italic}
+  .hero p.sub{margin:18px auto 0;max-width:520px;color:var(--mut);font-size:15px;line-height:1.7}
+
+  .ask{margin:44px auto 0;max-width:640px}
+  .q-label{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--mut);margin-bottom:10px}
+  #question{
+    width:100%;border:0;border-bottom:1px solid var(--line2);background:transparent;
+    font-family:'Cormorant Garamond',serif;font-style:italic;font-size:22px;color:var(--ink);
+    padding:10px 4px;text-align:center;outline:none;transition:border-color .3s;
+  }
+  #question::placeholder{color:#c6c1b6}
+  #question:focus{border-color:var(--ink)}
+
+  .seg{display:inline-flex;margin:30px auto 0;border:1px solid var(--line);border-radius:999px;padding:4px;gap:4px;flex-wrap:wrap;justify-content:center}
+  .seg button{
+    border:0;background:transparent;cursor:pointer;border-radius:999px;
+    padding:10px 20px;font-family:'Manrope';font-size:13px;letter-spacing:.06em;color:var(--mut);
+    transition:all .25s;
+  }
+  .seg button:hover{color:var(--ink)}
+  .seg button.on{background:var(--ink);color:#fff}
+
+  .cta{margin-top:30px;display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+  .btn{
+    border:1px solid var(--ink);background:var(--ink);color:#fff;cursor:pointer;
+    border-radius:999px;padding:15px 34px;font-family:'Manrope';font-size:13px;
+    letter-spacing:.18em;text-transform:uppercase;transition:all .25s;
+  }
+  .btn:hover{background:transparent;color:var(--ink)}
+  .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line2)}
+  .btn.ghost:hover{border-color:var(--ink)}
+  .btn:disabled{opacity:.35;pointer-events:none}
+
+  /* ---------- deck ---------- */
+  .deck-sec{padding:30px 0 10px;text-align:center}
+  .deck-head{display:flex;align-items:baseline;justify-content:center;gap:18px;flex-wrap:wrap;margin-bottom:8px}
+  .deck-head h2{font-family:'Cormorant Garamond',serif;font-weight:500;font-size:30px}
+  #hint{color:var(--mut);font-size:13px;letter-spacing:.08em}
+  .deck{
+    display:flex;justify-content:center;gap:14px;flex-wrap:wrap;
+    padding:34px 0 10px;
+  }
+  .flip{width:118px;aspect-ratio:3/5;perspective:1200px;cursor:pointer;position:relative;transition:transform .35s}
+  .flip:hover{transform:translateY(-8px)}
+  .deck.done .flip{cursor:default}
+  .deck.done .flip:not(.flipped){opacity:.25;pointer-events:none}
+  .flip-inner{position:absolute;inset:0;transform-style:preserve-3d;transition:transform .9s cubic-bezier(.25,.7,.2,1)}
+  .flip.flipped .flip-inner{transform:rotateY(180deg)}
+  .flip.flipped{cursor:zoom-in;transform:none}
+  .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:10px;overflow:hidden;background:#fff;border:1px solid var(--line2)}
+  .face.back{
+    background:#fff url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><g fill='none' stroke='%23bdb7a9' stroke-width='1'><circle cx='32' cy='32' r='15'/><circle cx='32' cy='32' r='22' stroke-dasharray='2 4'/><path d='M32 10v44M10 32h44M17 17l30 30M47 17L17 47'/><circle cx='32' cy='32' r='2.6' fill='%23bdb7a9' stroke='none'/></g></svg>") center/62% no-repeat;
+  }
+  .face.back::before{content:'';position:absolute;inset:6px;border:1px solid var(--line);border-radius:6px}
+  .face.front{transform:rotateY(180deg);display:flex;flex-direction:column}
+  .face.front img{width:100%;height:100%;object-fit:cover;object-position:top}
+  .face.front img.rev{transform:rotate(180deg)}
+  .flip.sel{transform:translateY(-14px)}
+  .flip.sel .face.back{border-color:var(--ink)}
+  .badge{
+    position:absolute;top:-12px;left:50%;transform:translateX(-50%);
+    width:24px;height:24px;border-radius:50%;background:var(--ink);color:#fff;
+    font-size:11px;display:flex;align-items:center;justify-content:center;letter-spacing:0;
+    opacity:0;transition:opacity .3s;z-index:2;
+  }
+  .flip.sel .badge{opacity:1}
+  .deck-actions{padding:16px 0 6px}
+
+  /* ---------- reading ---------- */
+  .reading{padding:56px 0 30px;border-top:1px solid var(--line);margin-top:44px}
+  .reading .q-echo{text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:clamp(20px,3vw,27px);color:var(--ink);max-width:700px;margin:0 auto}
+  .reading .q-echo::before{content:'«';color:var(--gold)} .reading .q-echo::after{content:'»';color:var(--gold)}
+  .verdict{
+    text-align:center;margin:34px auto 6px;font-family:'Cormorant Garamond',serif;font-size:44px;font-weight:500;
+  }
+  .verdict small{display:block;font-family:'Manrope';font-size:12px;letter-spacing:.24em;text-transform:uppercase;color:var(--mut);margin-bottom:8px}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:38px;margin-top:48px}
+  .rcard{animation:rise .8s both}
+  .rcard .pos{text-align:center;font-size:11px;letter-spacing:.28em;text-transform:uppercase;color:var(--gold);margin-bottom:14px}
+  .frame{
+    background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;
+    box-shadow:0 18px 40px -28px rgba(23,21,18,.35);cursor:zoom-in;transition:transform .35s, box-shadow .35s;
+  }
+  .frame:hover{transform:translateY(-6px);box-shadow:0 26px 50px -28px rgba(23,21,18,.45)}
+  .frame img{display:block;width:100%;border-radius:8px;aspect-ratio:3/5;object-fit:cover;object-position:top;background:var(--soft)}
+  .frame img.rev{transform:rotate(180deg)}
+  .rcard h3{text-align:center;font-family:'Cormorant Garamond',serif;font-weight:600;font-size:26px;margin-top:20px}
+  .rcard h3 span{color:var(--mut);font-weight:400;font-size:18px;margin-right:8px}
+  .chip-row{text-align:center;margin-top:10px}
+  .chip{display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;padding:5px 14px;border-radius:999px;border:1px solid var(--line2);color:var(--mut)}
+  .chip.rev{background:var(--ink);border-color:var(--ink);color:#fff}
+  .kw{text-align:center;font-family:'Cormorant Garamond',serif;font-style:italic;color:var(--gold);font-size:16px;margin-top:12px}
+  .mean{margin-top:12px;color:#4d4a44;font-size:14px;line-height:1.75;text-align:center;max-width:300px;margin-left:auto;margin-right:auto}
+  .read-actions{display:flex;justify-content:center;gap:14px;margin-top:52px;flex-wrap:wrap}
+
+  footer{border-top:1px solid var(--line);margin-top:70px;padding:30px 0 40px;text-align:center;color:var(--mut);font-size:12px;line-height:1.9;letter-spacing:.04em}
+
+  /* ---------- lightbox ---------- */
+  #lb{position:fixed;inset:0;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;z-index:50;cursor:zoom-out;padding:30px}
+  #lb.on{display:flex}
+  #lb img{max-height:86vh;border-radius:12px;box-shadow:0 30px 80px -30px rgba(23,21,18,.5);background:#fff}
+  #lb .cap{position:absolute;bottom:26px;left:0;right:0;text-align:center;font-family:'Cormorant Garamond',serif;font-size:22px}
+
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+  .fade{animation:rise .8s both}
+  @media (max-width:560px){ .flip{width:88px} .deck{gap:10px} }
+</style>
+</head>
+<body>
+
+<header><div class="wrap head">
+  <a class="logo" href="#">
+    <svg width="26" height="26" viewBox="0 0 64 64"><g fill="none" stroke="#171512" stroke-width="2"><circle cx="32" cy="32" r="15"/><path d="M32 6v52M6 32h52M14 14l36 36M50 14L14 50"/></g></svg>
+    <b>ARCANA</b><span>старшие арканы</span>
+  </a>
+  <div class="head-note">22 карты · Райдера–Уэйта</div>
+</div></header>
+
+<main>
+  <section class="wrap hero">
+    <div class="eyebrow">✦ &nbsp;оракул&nbsp; ✦</div>
+    <h1>Задайте вопрос —<br><em>карты ответят</em></h1>
+    <p class="sub">Сосредоточьтесь на вопросе, выберите расклад и карты, которые тянет вас к себе. Колода Райдера–Уэйта–Смит, 1909.</p>
+
+    <div class="ask">
+      <div class="q-label">Ваш вопрос</div>
+      <input id="question" type="text" placeholder="Что мне важно понять сейчас?" autocomplete="off">
+      <div class="seg" id="seg">
+        <button data-s="one" class="on">1 карта · ответ</button>
+        <button data-s="three">3 карты · прошлое–настоящее–будущее</button>
+        <button data-s="yesno">да / нет</button>
+      </div>
+      <div class="cta">
+        <button class="btn" id="deal">Раздать карты</button>
+        <button class="btn ghost" id="daily">Карта дня</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap deck-sec" id="deckSec" hidden>
+    <div class="deck-head"><h2>Выберите карты</h2><span id="hint"></span></div>
+    <div class="deck" id="deck"></div>
+    <div class="deck-actions">
+      <button class="btn" id="reveal" disabled>Открыть</button>
+      <button class="btn ghost" id="reshuffle">Перемешать</button>
+    </div>
+  </section>
+
+  <section class="wrap reading" id="reading" hidden></section>
+</main>
+
+<footer><div class="wrap">
+  Колода Райдера–Уэйта–Смит (1909), художница Памела Колман Смит — общественное достояние.<br>
+  Изображения: PNG-сканы Wikimedia Commons · толкования носят развлекательный характер.
+</div></footer>
+
+<div id="lb"><img alt=""><div class="cap"></div></div>
+
+<script>
+/* ============ ДАННЫЕ: 22 старших аркана ============ */
+const ROMAN=['0','I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII','XIII','XIV','XV','XVI','XVII','XVIII','XIX','XX','XXI'];
+/* yes: 1 = да, 0 = нейтрально, -1 = нет */
+const CARDS=[
+ {s:'The_Fool',ru:'Шут',kw:'начало · свобода · доверие',up:'Новый путь, лёгкость и доверие к миру. Время смело делать первый шаг — даже если план ещё не созрел.',rev:'Беспечность и риск без опоры; страх перемен заставляет топтаться на месте.',yes:1},
+ {s:'The_Magician',ru:'Маг',kw:'воля · ресурс · действие',up:'У вас есть все инструменты, чтобы воплотить замысел. Действуйте осознанно — сила на вашей стороне.',rev:'Распыление, манипуляции или неуверенность в своих силах мешают делу.',yes:1},
+ {s:'The_High_Priestess',ru:'Верховная Жрица',kw:'интуиция · тайна · тишина',up:'Ответ уже внутри вас: прислушайтесь к интуиции, а не к шуму мнений. Часть ситуации пока скрыта.',rev:'Заглушённая интуиция, секреты или поверхностные суждения.',yes:0},
+ {s:'The_Empress',ru:'Императрица',kw:'изобилие · забота · рост',up:'Период расцвета: дело зреет, отношения теплеют, творчество приносит плоды.',rev:'Застой, гиперопека или зависимость от комфорта.',yes:1},
+ {s:'The_Emperor',ru:'Император',kw:'порядок · структура · опора',up:'Нужны ясность, дисциплина и твёрдые правила: наведите порядок — и ситуация стабилизируется.',rev:'Жёсткий контроль либо, наоборот, отсутствие опоры и воли.',yes:1},
+ {s:'The_Hierophant',ru:'Иерофант',kw:'традиция · учение · совет',up:'Оперитесь на опыт, совет наставника или проверенный путь: время учиться и передавать знание.',rev:'Догмы устарели — ищите собственный смысл и новые правила.',yes:0},
+ {s:'The_Lovers',ru:'Влюблённые',kw:'выбор · союз · гармония',up:'Впереди важный выбор сердца или значимый союз. Действуйте из любви, а не из страха.',rev:'Разлад, неверный выбор или колебания между двумя путями.',yes:1},
+ {s:'The_Chariot',ru:'Колесница',kw:'прорыв · победа · контроль',up:'Соберите волю в кулак: уверенное движение вперёд принесёт победу над обстоятельствами.',rev:'Потеря направления, суета или попытка форсировать события.',yes:1},
+ {s:'Strength',ru:'Сила',kw:'мужество · мягкость · выдержка',up:'Побеждает не грубость, а мягкая сила: терпение и внутреннее спокойствие укротят любую бурю.',rev:'Сомнения в себе, подавленные страхи или упадок сил.',yes:1},
+ {s:'The_Hermit',ru:'Отшельник',kw:'уединение · поиск · смысл',up:'Пауза и уединение помогут услышать себя: ответ придёт в тишине, а не в суете.',rev:'Изоляция, отчуждение или отказ от нужного совета.',yes:0},
+ {s:'Wheel_of_Fortune',ru:'Колесо Фортуны',kw:'цикл · шанс · перемены',up:'Поворот судьбы: обстоятельства меняются сами — ловите момент и не цепляйтесь за старое.',rev:'Повторяющийся круг или сопротивление неизбежным переменам.',yes:1},
+ {s:'Justice',ru:'Справедливость',kw:'истина · баланс · ответ',up:'Всё встанет по местам: честность и ясный расчёт важнее эмоций; решение будет справедливым.',rev:'Неискренность, перекос или уход от ответственности.',yes:0},
+ {s:'The_Hanged_Man',ru:'Повешенный',kw:'пауза · новый взгляд · жертва',up:'Взгляните на ситуацию под другим углом: добровольная пауза принесёт озарение.',rev:'Затянувшееся ожидание, жертвы впустую или застой.',yes:-1},
+ {s:'Death',ru:'Смерть',kw:'трансформация · конец · обновление',up:'Этап завершается, освобождая место новому: отпустите отжившее — и начнётся перерождение.',rev:'Страх перемен и цепляние за прошлое затягивают кризис.',yes:-1},
+ {s:'Temperance',ru:'Умеренность',kw:'гармония · мера · исцеление',up:'Баланс и терпение: сглаживайте, смешивайте, не спешите — гармония даст лучший результат.',rev:'Крайности, нетерпеливость или внутренний разлад.',yes:1},
+ {s:'The_Devil',ru:'Дьявол',kw:'соблазн · зависимость · тень',up:'Проверка на свободу: соблазн или привязанность могут управлять вами — осознайте свои цепи.',rev:'Освобождение от зависимости, прозрение, разрыв вредных уз.',yes:-1},
+ {s:'The_Tower',ru:'Башня',kw:'обвал · прозрение · перезагрузка',up:'Внезапная перемена разрушает старую конструкцию: это больно, но расчищает место правде.',rev:'Страх катастрофы или отложенные, но назревшие перемены.',yes:-1},
+ {s:'The_Star',ru:'Звезда',kw:'надежда · вдохновение · вера',up:'Надежда возвращается: верьте в лучшее и действуйте из вдохновения — путь открыт.',rev:'Угасшая вера, уныние или кажущаяся недосягаемой цель.',yes:1},
+ {s:'The_Moon',ru:'Луна',kw:'иллюзии · страхи · подсознание',up:'Ситуация туманна: не всё таково, каким кажется. Доверьтесь интуиции, но проверяйте страхи на свет.',rev:'Туман рассеивается: страхи слабеют, правда выходит наружу.',yes:-1},
+ {s:'The_Sun',ru:'Солнце',kw:'радость · успех · ясность',up:'Ясное «да» жизни: радость, успех и прозрачность во всём; согревайте этим и других.',rev:'Радость омрачена завышенными ожиданиями или выгоранием.',yes:1},
+ {s:'Judgement',ru:'Суд',kw:'возрождение · зов · итог',up:'Время подвести итог и откликнуться на зов: возможно второе рождение того, что казалось утраченным.',rev:'Неуслышанный зов, самокритика или отложенные решения.',yes:1},
+ {s:'The_World',ru:'Мир',kw:'завершение · целостность · достижение',up:'Цикл завершён: достижение, признание и целостность. Можно праздновать и начинать новый круг.',rev:'Незавершённость: последний шаг откладывается — доведите дело до конца.',yes:1},
+];
+const SPREADS={one:{n:1,pos:['Карта ответа']},three:{n:3,pos:['Прошлое','Настоящее','Будущее']},yesno:{n:1,pos:['Да или нет']}};
+
+/* ============ СОСТОЯНИЕ ============ */
+let spread='one', selected=[], revealed=false, daily=false;
+const $=id=>document.getElementById(id);
+const deckEl=$('deck'), hintEl=$('hint'), revealBtn=$('reveal'), readingEl=$('reading');
+const shuffle=a=>{a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a};
+const need=()=>daily?1:SPREADS[spread].n;
+
+/* ============ КАРТИНКИ: PNG Wikimedia + запасные ============ */
+function imgUrls(c){
+  const i=String(CARDS.indexOf(c)).padStart(2,'0');
+  const bare=c.s.replace(/^The_/,'');
+  return [
+    `https://commons.wikimedia.org/wiki/Special:FilePath/${c.s}_(Rider-Waite_Smith_tarot_deck).png?width=520`,
+    `https://commons.wikimedia.org/wiki/Special:FilePath/RWS_Tarot_${i}_${bare}.jpg?width=520`,
+    `https://raw.githubusercontent.com/mixvlad/TarotCards/main/tarot/rider-waite/720px/${i}_${bare}.jpg`
+  ];
+}
+function setImg(img,urls,k=0){
+  img.src=urls[k];
+  img.onerror=()=>{ if(k+1<urls.length) setImg(img,urls,k+1); };
+}
+
+/* ============ КОЛОДА ============ */
+function renderDeck(){
+  revealed=false; selected=[];
+  deckEl.classList.remove('done'); deckEl.innerHTML='';
+  for(let k=0;k<12;k++){
+    const f=document.createElement('div'); f.className='flip'; f.dataset.k=k;
+    f.innerHTML=`<span class="badge"></span><div class="flip-inner">
+      <div class="face back"></div><div class="face front"></div></div>`;
+    f.onclick=()=>toggle(f);
+    deckEl.appendChild(f);
+  }
+  updateHint();
+}
+function toggle(f){
+  if(revealed) return;
+  const k=+f.dataset.k, at=selected.indexOf(k);
+  if(at>-1){ selected.splice(at,1); f.classList.remove('sel'); }
+  else if(selected.length<need()){ selected.push(k); f.classList.add('sel'); }
+  selected.forEach((kk,ord)=>{ deckEl.querySelector(`[data-k="${kk}"] .badge`).textContent=ord+1; });
+  updateHint();
+}
+function updateHint(){
+  hintEl.textContent=`выбрано ${selected.length} из ${need()}`;
+  revealBtn.disabled=!(selected.length===need());
+}
+
+/* ============ РАСКЛАД ============ */
+function reveal(){
+  revealed=true; deckEl.classList.add('done'); revealBtn.disabled=true;
+  const draws=shuffle(CARDS.map((_,i)=>i)).slice(0,need()).map(i=>({c:CARDS[i],rev:Math.random()<.5}));
+  const pos=daily?['Карта дня']:SPREADS[spread].pos;
+  selected.forEach((k,ord)=>{
+    const f=deckEl.querySelector(`[data-k="${k}"]`), d=draws[ord];
+    const img=new Image(); setImg(img,imgUrls(d.c)); if(d.rev) img.className='rev';
+    f.querySelector('.face.front').appendChild(img);
+    setTimeout(()=>f.classList.add('flipped'), 250+ord*300);
+    f.onclick=()=>openLb(d);
+  });
+  setTimeout(()=>buildReading(draws,pos), 250+need()*300+700);
+}
+function buildReading(draws,pos){
+  const q=$('question').value.trim();
+  let html=`<div class="fade">`+
+    (q?`<div class="q-echo">${esc(q)}</div>`:`<div class="q-echo" style="font-size:20px;color:var(--mut)">Вопрос не задан — карты говорят о главном сейчас</div>`);
+  if(spread==='yesno'&&!daily){
+    let v=draws[0].rev?-draws[0].c.yes:draws[0].c.yes;
+    const word=v===1?'Да':v===-1?'Нет':'Пока не определено';
+    html+=`<div class="verdict"><small>ответ колоды</small>${word}</div>`;
+  }
+  html+=`<div class="cards">`;
+  draws.forEach((d,ord)=>{
+    const u=imgUrls(d.c);
+    html+=`<article class="rcard" style="animation-delay:${ord*.15}s">
+      <div class="pos">${pos[ord]}</div>
+      <div class="frame" data-o="${ord}"><img loading="lazy" alt="${d.c.ru}"></div>
+      <h3><span>${ROMAN[CARDS.indexOf(d.c)]}</span>${d.c.ru}</h3>
+      <div class="chip-row"><span class="chip ${d.rev?'rev':''}">${d.rev?'перевёрнутая':'прямая'}</span></div>
+      <div class="kw">${d.kw}</div>
+      <p class="mean">${d.rev?d.c.rev:d.c.up}</p>
+    </article>`;
+  });
+  html+=`</div><div class="read-actions">
+      <button class="btn" id="again">Спросить снова</button>
+      <button class="btn ghost" id="newq">Новый вопрос</button>
+    </div></div>`;
+  readingEl.innerHTML=html; readingEl.hidden=false;
+  draws.forEach((d,ord)=>{
+    const img=readingEl.querySelector(`.frame[data-o="${ord}"] img`);
+    setImg(img,imgUrls(d)); if(d.rev) img.classList.add('rev');
+    img.parentElement.onclick=()=>openLb(d);
+  });
+  $('again').onclick=()=>{ resetRound(); $('deckSec').scrollIntoView({behavior:'smooth'}); };
+  $('newq').onclick=()=>{ daily=false; resetRound(); readingEl.hidden=true;
+    $('question').focus(); window.scrollTo({top:0,behavior:'smooth'}); };
+  readingEl.scrollIntoView({behavior:'smooth'});
+}
+function resetRound(){ readingEl.hidden=true; renderDeck(); }
+const esc=s=>s.replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]));
+
+/* ============ ЛАЙТБОКС ============ */
+function openLb(d){
+  const lb=$('lb'), img=lb.querySelector('img');
+  setImg(img,imgUrls(d.c)); img.classList.toggle('rev',d.rev);
+  lb.querySelector('.cap').textContent=`${d.c.ru} · ${d.rev?'перевёрнутая':'прямая'}`;
+  lb.classList.add('on');
+}
+$('lb').onclick=()=>$('lb').classList.remove('on');
+addEventListener('keydown',e=>{if(e.key==='Escape')$('lb').classList.remove('on')});
+
+/* ============ УПРАВЛЕНИЕ ============ */
+$('seg').addEventListener('click',e=>{
+  const b=e.target.closest('button'); if(!b) return;
+  [...$('seg').children].forEach(x=>x.classList.toggle('on',x===b));
+  spread=b.dataset.s; daily=false; resetRound();
+});
+$('deal').onclick=()=>{
+  daily=false; resetRound();
+  $('deckSec').hidden=false;
+  $('deckSec').scrollIntoView({behavior:'smooth'});
+};
+$('daily').onclick=()=>{
+  daily=true; resetRound(); $('deckSec').hidden=false;
+  selected=[+deckEl.children[Math.floor(Math.random()*12)].dataset.k];
+  deckEl.querySelector(`[data-k="${selected[0]}"]`).classList.add('sel');
+  deckEl.querySelector(`[data-k="${selected[0]}"] .badge`).textContent=1;
+  updateHint(); reveal();
+};
+$('reveal').onclick=reveal;
+$('reshuffle').onclick=()=>{ if(!revealed) renderDeck(); };
+
+renderDeck();
+</script>
+</body>
+</html>
